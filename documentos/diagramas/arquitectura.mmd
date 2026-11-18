@@ -1,0 +1,9 @@
+flowchart LR
+  D["datos/ JSON y CSV"] --> P["Persistencia"]
+  P --> M["Modelos: Producto y Movimiento"]
+  M --> I["Reglas: Inventario"]
+  I --> R["Reportes y resultados"]
+  C["CLI"] --> I
+  G["GUI Python / Swing / Web"] --> I
+  I --> P
+  T["Pruebas automatizadas"] --> I

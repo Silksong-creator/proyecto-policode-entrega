@@ -1,0 +1,26 @@
+[
+  {
+    "codigo_producto": "P001",
+    "tipo": "entrada",
+    "cantidad": 10,
+    "fecha": "2026-11-01"
+  },
+  {
+    "codigo_producto": "P002",
+    "tipo": "salida",
+    "cantidad": 3,
+    "fecha": "2026-11-02"
+  },
+  {
+    "codigo_producto": "P004",
+    "tipo": "salida",
+    "cantidad": 5,
+    "fecha": "2026-11-03"
+  },
+  {
+    "codigo_producto": "P006",
+    "tipo": "entrada",
+    "cantidad": 2,
+    "fecha": "2026-11-04"
+  }
+]

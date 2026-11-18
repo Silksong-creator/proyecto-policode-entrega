@@ -1,0 +1,18 @@
+[
+  {
+    "codigo": "P001",
+    "nombre": "Teclado USB",
+    "categoria": "Perifericos",
+    "precio": 25.5,
+    "existencia": 40,
+    "stock_minimo": 10
+  },
+  {
+    "codigo": "P002",
+    "nombre": "Mouse Inalambrico",
+    "categoria": "Perifericos",
+    "precio": 15.75,
+    "existencia": 5,
+    "stock_minimo": 10
+  }
+]

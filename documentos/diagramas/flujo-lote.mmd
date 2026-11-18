@@ -1,0 +1,8 @@
+flowchart TD
+  A["Recibir lote"] --> B["Guardar existencias e índice de historial"]
+  B --> C{"Validar y aplicar movimiento"}
+  C -->|"Quedan movimientos"| C
+  C -->|"Todos válidos"| D["Confirmar lote"]
+  C -->|"Error"| E["Restaurar existencias"]
+  E --> F["Eliminar movimientos del lote"]
+  F --> G["Propagar error"]

@@ -1,0 +1,50 @@
+[
+  {
+    "codigo": "P001",
+    "nombre": "Teclado USB",
+    "categoria": "Perifericos",
+    "precio": 25.5,
+    "existencia": 40,
+    "stock_minimo": 10
+  },
+  {
+    "codigo": "P002",
+    "nombre": "Mouse Inalambrico",
+    "categoria": "Perifericos",
+    "precio": 15.75,
+    "existencia": 5,
+    "stock_minimo": 10
+  },
+  {
+    "codigo": "P003",
+    "nombre": "Monitor 24 pulg",
+    "categoria": "Monitores",
+    "precio": 180.0,
+    "existencia": 12,
+    "stock_minimo": 4
+  },
+  {
+    "codigo": "P004",
+    "nombre": "Laptop Pro 14",
+    "categoria": "Computo",
+    "precio": 950.0,
+    "existencia": 0,
+    "stock_minimo": 2
+  },
+  {
+    "codigo": "P005",
+    "nombre": "Cable HDMI 2m",
+    "categoria": "Accesorios",
+    "precio": 8.9,
+    "existencia": 120,
+    "stock_minimo": 20
+  },
+  {
+    "codigo": "P006",
+    "nombre": "Disco SSD 500GB",
+    "categoria": "Almacenamiento",
+    "precio": 65.0,
+    "existencia": 3,
+    "stock_minimo": 5
+  }
+]

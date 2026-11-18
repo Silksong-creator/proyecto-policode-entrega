@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Control de Inventario — JavaScript/Web</title>
+<style>
+  * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+  body { margin: 0; background: #f4f6f9; color: #222; }
+  header { background: #1f3a5f; color: #fff; padding: 14px 20px; }
+  header h1 { margin: 0; font-size: 20px; }
+  .panel { background: #fff; margin: 14px; padding: 12px 16px; border-radius: 8px;
+           box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  #acciones button { margin: 3px; padding: 7px 12px; border: 0; border-radius: 5px;
+                     background: #2d6cdf; color: #fff; cursor: pointer; }
+  #acciones button:hover { background: #2458b8; }
+  #filtros input[type=text], #filtros select { padding: 6px; margin: 3px;
+                                               border: 1px solid #bbb; border-radius: 4px; }
+  #filtros label { margin-right: 8px; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #e2e2e2; text-align: center; font-size: 14px; }
+  th { background: #eef2f8; position: sticky; top: 0; }
+  tbody tr:hover { background: #f0f6ff; cursor: pointer; }
+  tr.alerta td { background: #fff3cd; }
+  tr.agotado td { background: #f8d7da; color: #842029; }
+  tr.sel td { outline: 2px solid #2d6cdf; }
+  #mensaje { min-height: 20px; margin: 0 14px; font-weight: 600; }
+  #mensaje.error { color: #c0392b; }
+  #mensaje.aviso { color: #b8860b; }
+  #total { font-size: 17px; font-weight: 700; color: #1f3a5f; }
+  footer.panel { display: flex; justify-content: space-between; align-items: center; }
+  fieldset { display: inline-flex; flex-wrap: wrap; gap: 6px; border: 1px solid #ddd; margin: 3px; }
+  fieldset label { white-space: nowrap; }
+  @media (max-width: 760px) {
+    .panel { margin: 8px; padding: 10px; }
+    #acciones { display: flex; flex-wrap: wrap; }
+    #filtros { display: flex; flex-wrap: wrap; gap: 8px; }
+    footer.panel { align-items: flex-start; flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<header><h1>📦 Sistema de Control de Inventario — JavaScript (misma lógica que la versión Node)</h1></header>
+
+<div id="mensaje"></div>
+
+<div class="panel" id="acciones">
+  <button data-acc="nuevo">＋ Nuevo producto</button>
+  <button data-acc="modificar">✏️ Modificar</button>
+  <button data-acc="entrada">⬇ Entrada</button>
+  <button data-acc="salida">⬆ Salida</button>
+  <button data-acc="historial">🕘 Historial</button>
+  <button data-acc="json">Exportar JSON</button>
+  <button data-acc="csv">Exportar CSV</button>
+</div>
+
+<div class="panel" id="filtros">
+  <label>Buscar: <input type="text" id="buscar" placeholder="nombre…"></label>
+  <label>Categoría: <input type="text" id="categoria" placeholder="categoría…"></label>
+  <fieldset><legend>Reporte</legend>
+    <label><input type="radio" name="reporte" value="todos" checked> Todos</label>
+    <label><input type="radio" name="reporte" value="disponibles"> Disponibles</label>
+    <label><input type="radio" name="reporte" value="agotados"> Agotados</label>
+    <label><input type="radio" name="reporte" value="bajo"> Bajo inventario</label>
+    <label><input type="radio" name="reporte" value="mayor_valor"> Mayor valor</label>
+  </fieldset>
+  <label>Ordenar por:
+    <select id="orden">
+      <option value="codigo">código</option>
+      <option value="precio">precio</option>
+      <option value="existencia">existencia</option>
+      <option value="categoria">categoría</option>
+    </select>
+  </label>
+</div>
+
+<div class="panel" style="max-height:340px; overflow:auto;">
+  <table id="tabla">
+    <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Precio</th>
+               <th>Existencia</th><th>Stock mín.</th><th>Valor</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<footer class="panel">
+  <span>🟡 amarillo = bajo inventario · 🔴 rojo = agotado · clic para seleccionar</span>
+  <span id="total"></span>
+</footer>
+
+<!-- Los dos scripts son los MISMOS archivos de lógica de negocio de la versión Node -->
+<script src="../src/models.js"></script>
+<script src="../src/inventario.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

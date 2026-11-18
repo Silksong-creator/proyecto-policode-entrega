@@ -1,0 +1,7 @@
+codigo,nombre,categoria,precio,existencia,stock_minimo
+P001,Teclado USB,Perifericos,25.5,40,10
+P002,Mouse Inalambrico,Perifericos,15.75,5,10
+P003,Monitor 24 pulg,Monitores,180.0,12,4
+P004,Laptop Pro 14,Computo,950.0,0,2
+P005,Cable HDMI 2m,Accesorios,8.9,120,20
+P006,Disco SSD 500GB,Almacenamiento,65.0,3,5

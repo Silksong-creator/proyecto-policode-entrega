@@ -1,0 +1,11 @@
+{
+  "name": "inventario-javascript",
+  "version": "1.0.0",
+  "description": "Sistema de control de inventario - versión JavaScript (Node.js)",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test tests/inventario.test.js"
+  },
+  "engines": { "node": ">=18" }
+}
