@@ -96,3 +96,15 @@ Para el dataset inicial: valor total **$4,521.75**; P004 agotado; P002 y P006 ba
 
 Revisión automatizada: Python **18/18**, Java **22/22**, JavaScript **12/12**. Ejecuta los comandos anteriores para reproducirlos.
 
+## Git y evidencias
+
+El repositorio Git ya está inicializado y contiene el estado entregable actual. Para continuar registrando cambios:
+
+```powershell
+git add -A
+git commit -m "Describe el cambio"
+```
+
+Los tres JSON por tamaño son subconjuntos del mismo catálogo: pequeño (2 productos), mediano (4) y grande (6). Cada implementación puede apuntar al archivo elegido; los resultados esperados del README corresponden al conjunto completo `productos.json`. La carpeta `evidencias/` debe completarse con capturas y/o video generados por el equipo al ejecutar cada GUI. No se agregaron evidencias simuladas. Agrega nombres de integrantes, institución, grupo y docente a la portada antes de entregar.
+
+El código no contiene claves ni contraseñas. El análisis comparativo está en `documentos/analisis-comparativo.md` y `documentos/analisis-comparativo.pdf`; la guía detallada está en `documentos/manual-tecnico.pdf`.
