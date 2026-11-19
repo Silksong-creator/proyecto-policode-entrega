@@ -86,6 +86,8 @@ La tabla presenta una fila por producto y estas columnas:
 
 El resumen **Valor total del inventario** suma el valor de todos los productos, aunque la tabla esté mostrando solo un filtro. Los importes se presentan con dos decimales. La selección de la fila permite indicar a qué producto se aplican las operaciones.
 
+Cuando hay productos bajo el mínimo, aparece una ventana emergente con código, nombre, existencia actual y mínimo. Se muestra al iniciar si ya hay alertas y cuando una operación válida hace que un producto nuevo llegue a ese nivel. No vuelve a salir para el mismo producto mientras siga bajo; si se repone y luego vuelve a llegar al mínimo, se notificará otra vez. La banda **AVISO: Existencias bajas** también permanece visible y se actualiza con el inventario. Los productos agotados se consultan por separado en **Agotados**.
+
 En las tres interfaces, **Todos**, **Disponibles**, **Agotados**, **Bajo inventario** y **Mayor valor** son filtros de reporte. En Python y JavaScript se combinan con texto y categoría; Java aplica igualmente búsqueda/categoría junto con el reporte. Los criterios de ordenamiento cambian la presentación de las filas, no el catálogo guardado.
 
 En la versión web, una fila amarilla indica bajo inventario, una fila roja indica producto agotado y un contorno azul indica selección. En las versiones de escritorio usa el filtro **Bajo inventario** o **Agotados** para localizar esos productos.

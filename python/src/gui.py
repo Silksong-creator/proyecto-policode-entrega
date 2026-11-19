@@ -25,8 +25,10 @@ class InventarioGUI(tk.Tk):
         self.title("Sistema de Control de Inventario - Python/tkinter")
         self.geometry("980x560")
         self.inv = inventario
+        self._codigos_alertados_stock = set()
         self._crear_widgets()
         self._refrescar()
+        self.after(350, self._notificar_stock_bajo_nuevo)
 
     def _crear_widgets(self):
         barra = ttk.Frame(self)
@@ -60,6 +62,11 @@ class InventarioGUI(tk.Tk):
                              values=["codigo", "precio", "existencia", "categoria"])
         combo.pack(side="left")
         combo.bind("<<ComboboxSelected>>", lambda *_: self._refrescar())
+
+        self.var_alerta_stock = tk.StringVar()
+        ttk.Label(self, textvariable=self.var_alerta_stock, foreground="#8a5a00",
+                  font=("", 10, "bold"), wraplength=960, anchor="w").pack(
+                      fill="x", padx=12, pady=(2, 0))
 
         tabla_frame = ttk.Frame(self)
         tabla_frame.pack(fill="both", expand=True, padx=8, pady=6)
@@ -117,6 +124,31 @@ class InventarioGUI(tk.Tk):
         if codigo_seleccionado and codigo_seleccionado not in {p.codigo for p in datos}:
             self.tabla.selection_remove(codigo_seleccionado)
         self.var_total.set(f"Valor total del inventario: ${self.inv.valor_total():,.2f}")
+        alertas = self.inv.alertas_bajo_inventario()
+        if alertas:
+            detalle = ", ".join(
+                f"{p.codigo} - {p.nombre} ({p.existencia}/{p.stock_minimo})"
+                for p in alertas
+            )
+            self.var_alerta_stock.set(f"AVISO: Existencias bajas: {detalle}")
+        else:
+            self.var_alerta_stock.set("")
+
+    def _notificar_stock_bajo_nuevo(self):
+        alertas = self.inv.alertas_bajo_inventario()
+        codigos_actuales = {p.codigo for p in alertas}
+        nuevas = [p for p in alertas if p.codigo not in self._codigos_alertados_stock]
+        self._codigos_alertados_stock = codigos_actuales
+        if nuevas:
+            detalle = "\n".join(
+                f"• {p.codigo} - {p.nombre}: {p.existencia} unidades (mínimo: {p.stock_minimo})"
+                for p in nuevas
+            )
+            messagebox.showwarning(
+                "Alerta de existencias bajas",
+                "Estos productos llegaron al mínimo o están por debajo:\n\n" + detalle,
+                parent=self,
+            )
 
     def _codigo_seleccionado_sin_aviso(self):
         seleccion = self.tabla.selection()
@@ -139,9 +171,13 @@ class InventarioGUI(tk.Tk):
         try:
             self.inv.agregar_producto(Producto(d["codigo"], d["nombre"], d["categoria"],
                                                float(d["precio"]), int(d["existencia"]), int(d["stock_minimo"])))
+            actualizado = True
         except (ValueError, KeyError) as e:
+            actualizado = False
             messagebox.showerror("Error", str(e))
         self._refrescar()
+        if actualizado:
+            self._notificar_stock_bajo_nuevo()
 
     def _modificar_producto(self):
         codigo = self._seleccionado()
@@ -155,9 +191,13 @@ class InventarioGUI(tk.Tk):
         try:
             self.inv.modificar_producto(codigo, nombre=d["nombre"], categoria=d["categoria"],
                                         precio=float(d["precio"]), stock_minimo=int(d["stock_minimo"]))
+            actualizado = True
         except (ValueError, KeyError) as e:
+            actualizado = False
             messagebox.showerror("Error", str(e))
         self._refrescar()
+        if actualizado:
+            self._notificar_stock_bajo_nuevo()
 
     def _movimiento(self, tipo):
         codigo = self._seleccionado()
@@ -172,9 +212,13 @@ class InventarioGUI(tk.Tk):
                 self.inv.registrar_entrada(codigo, cantidad, str(date.today()))
             else:
                 self.inv.registrar_salida(codigo, cantidad, str(date.today()))
+            actualizado = True
         except (ValueError, KeyError) as e:
+            actualizado = False
             messagebox.showerror("Movimiento rechazado", str(e))
         self._refrescar()
+        if actualizado:
+            self._notificar_stock_bajo_nuevo()
 
     def _historial(self):
         codigo = self._seleccionado()

@@ -21,6 +21,7 @@ const SEED = [
 
 let inv;
 let temporizadorMensaje;
+let codigosAlertadosStock = new Set();
 
 // ---------- utilidades ----------
 const $ = (sel) => document.querySelector(sel);
@@ -92,6 +93,21 @@ function refrescar() {
     tbody.appendChild(tr);
   }
   $("#total").textContent = `Valor total del inventario: $${inv.valorTotal().toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  const alertasStock = inv.alertasBajoInventario();
+  $("#alertaStock").textContent = alertasStock.length
+    ? `AVISO: Existencias bajas: ${alertasStock.map((p) => `${p.codigo} - ${p.nombre} (${p.existencia}/${p.stock_minimo})`).join(", ")}`
+    : "";
+}
+
+function notificarStockBajoNuevo() {
+  const alertas = inv.alertasBajoInventario();
+  const nuevas = alertas.filter((p) => !codigosAlertadosStock.has(p.codigo));
+  codigosAlertadosStock = new Set(alertas.map((p) => p.codigo));
+  if (nuevas.length) {
+    const detalle = nuevas.map((p) =>
+      `• ${p.codigo} - ${p.nombre}: ${p.existencia} unidades (mínimo: ${p.stock_minimo})`).join("\n");
+    window.alert(`Alerta de existencias bajas\n\nEstos productos llegaron al mínimo o están por debajo:\n\n${detalle}`);
+  }
 }
 
 let codigoSel = null;
@@ -120,10 +136,13 @@ function accionNuevo() {
   const stock_minimo = Number(minimoTexto);
   if (!Number.isFinite(precio) || !Number.isInteger(existencia) || !Number.isInteger(stock_minimo))
     return mostrarError(new Error("Precio debe ser numérico y existencia/mínimo deben ser enteros."));
+  let operacionExitosa = false;
   try {
     inv.agregarProducto(new Producto({ codigo, nombre, categoria, precio, existencia, stock_minimo }));
+    operacionExitosa = true;
   } catch (e) { mostrarError(e); }
   refrescar();
+  if (operacionExitosa) notificarStockBajoNuevo();
 }
 
 function accionModificar() {
@@ -138,10 +157,13 @@ function accionModificar() {
   const stock_minimo = Number(minimoTexto);
   if (!Number.isFinite(precio) || !Number.isInteger(stock_minimo))
     return mostrarError(new Error("Precio debe ser numérico y stock mínimo debe ser entero."));
+  let operacionExitosa = false;
   try {
     inv.modificarProducto(codigo, { nombre, categoria, precio, stock_minimo });
+    operacionExitosa = true;
   } catch (e) { mostrarError(e); }
   refrescar();
+  if (operacionExitosa) notificarStockBajoNuevo();
 }
 
 function accionMovimiento(tipo) {
@@ -151,11 +173,14 @@ function accionMovimiento(tipo) {
   const cantidad = Number(texto);
   if (!Number.isInteger(cantidad) || cantidad <= 0)
     return mostrarError(new Error("La cantidad debe ser un entero positivo."));
+  let operacionExitosa = false;
   try {
     if (tipo === "entrada") inv.registrarEntrada(codigo, cantidad, hoy());
     else inv.registrarSalida(codigo, cantidad, hoy());
+    operacionExitosa = true;
   } catch (e) { mostrarError(e); }  // salida excesiva, producto inexistente, etc.
   refrescar();
+  if (operacionExitosa) notificarStockBajoNuevo();
 }
 
 function accionHistorial() {
@@ -204,6 +229,7 @@ async function iniciar() {
   $("#orden").addEventListener("change", refrescar);
   document.querySelectorAll('input[name="reporte"]').forEach((r) => r.addEventListener("change", refrescar));
   refrescar();
+  notificarStockBajoNuevo();
 }
 
 document.addEventListener("DOMContentLoaded", iniciar);

@@ -26,6 +26,9 @@
   #mensaje { min-height: 20px; margin: 0 14px; font-weight: 600; }
   #mensaje.error { color: #c0392b; }
   #mensaje.aviso { color: #b8860b; }
+  #alertaStock { margin: 8px 14px; padding: 9px 12px; border-left: 4px solid #d69e00;
+                 border-radius: 4px; background: #fff3cd; color: #725000; font-weight: 700; }
+  #alertaStock:empty { display: none; }
   #total { font-size: 17px; font-weight: 700; color: #1f3a5f; }
   footer.panel { display: flex; justify-content: space-between; align-items: center; }
   fieldset { display: inline-flex; flex-wrap: wrap; gap: 6px; border: 1px solid #ddd; margin: 3px; }
@@ -42,6 +45,7 @@
 <header><h1>📦 Sistema de Control de Inventario — JavaScript (misma lógica que la versión Node)</h1></header>
 
 <div id="mensaje"></div>
+<div id="alertaStock" role="status" aria-live="polite"></div>
 
 <div class="panel" id="acciones">
   <button data-acc="nuevo">＋ Nuevo producto</button>

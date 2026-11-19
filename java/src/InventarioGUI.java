@@ -14,6 +14,8 @@ public class InventarioGUI extends JFrame {
     private final JTable tabla;
     private final DefaultTableModel modelo;
     private final JLabel lblTotal = new JLabel();
+    private final JLabel lblAlertasStock = new JLabel();
+    private final java.util.Set<String> codigosAlertadosStock = new java.util.HashSet<>();
     private final JTextField txtBuscar = new JTextField(12);
     private final JTextField txtCategoria = new JTextField(10);
     private final JComboBox<String> cmbOrden = new JComboBox<>(
@@ -75,9 +77,13 @@ public class InventarioGUI extends JFrame {
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // --- pie ---
-        JPanel pie = new JPanel(new BorderLayout());
-        pie.add(lblTotal, BorderLayout.EAST);
-        pie.add(new JLabel("🟡 bajo inventario · seleccione una fila y use los botones"), BorderLayout.WEST);
+        JPanel resumen = new JPanel(new BorderLayout());
+        lblAlertasStock.setForeground(new Color(138, 90, 0));
+        resumen.add(lblAlertasStock, BorderLayout.CENTER);
+        resumen.add(lblTotal, BorderLayout.EAST);
+        JPanel pie = new JPanel(new GridLayout(2, 1));
+        pie.add(resumen);
+        pie.add(new JLabel("Seleccione una fila y use los botones para operar sobre un producto."));
 
         setLayout(new BorderLayout());
         JPanel norte = new JPanel(new GridLayout(2, 1));
@@ -88,6 +94,7 @@ public class InventarioGUI extends JFrame {
         add(pie, BorderLayout.SOUTH);
 
         refrescar();
+        SwingUtilities.invokeLater(this::notificarStockBajoNuevo);
     }
 
     private String codigoSeleccionado() {
@@ -123,9 +130,38 @@ public class InventarioGUI extends JFrame {
                 String.format("%.2f", p.getPrecio()), p.getExistencia(),
                 p.getStockMinimo(), String.format("%.2f", p.getValorTotal())});
         lblTotal.setText(String.format("Valor total del inventario: $%,.2f", inv.valorTotal()));
+        List<Producto> alertas = inv.alertasBajoInventario();
+        if (alertas.isEmpty()) {
+            lblAlertasStock.setText("");
+        } else {
+            String detalle = alertas.stream()
+                .map(p -> String.format("%s - %s (%d/%d)", p.getCodigo(), p.getNombre(),
+                    p.getExistencia(), p.getStockMinimo()))
+                .collect(java.util.stream.Collectors.joining(", "));
+            lblAlertasStock.setText("AVISO: Existencias bajas: " + detalle);
+        }
+    }
+
+    private void notificarStockBajoNuevo() {
+        List<Producto> alertas = inv.alertasBajoInventario();
+        List<Producto> nuevas = alertas.stream()
+            .filter(p -> !codigosAlertadosStock.contains(p.getCodigo()))
+            .toList();
+        codigosAlertadosStock.clear();
+        alertas.forEach(p -> codigosAlertadosStock.add(p.getCodigo()));
+        if (!nuevas.isEmpty()) {
+            String detalle = nuevas.stream()
+                .map(p -> String.format("• %s - %s: %d unidades (mínimo: %d)",
+                    p.getCodigo(), p.getNombre(), p.getExistencia(), p.getStockMinimo()))
+                .collect(java.util.stream.Collectors.joining("\n"));
+            JOptionPane.showMessageDialog(this,
+                "Estos productos llegaron al mínimo o están por debajo:\n\n" + detalle,
+                "Alerta de existencias bajas", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void nuevoProducto() {
+        boolean actualizado = false;
         try {
             String codigo = pedir("Código:");
             if (codigo == null) return;
@@ -143,14 +179,17 @@ public class InventarioGUI extends JFrame {
                 categoria.isBlank() ? "General" : categoria,
                 Double.parseDouble(precio), Integer.parseInt(existencia),
                 Integer.parseInt(minimo)));
+            actualizado = true;
         } catch (Exception e) { error(e); }
         refrescar();
+        if (actualizado) notificarStockBajoNuevo();
     }
 
     private void modificarProducto() {
         String codigo = codigoSeleccionado();
         if (codigo == null) return;
         Producto p = inv.consultarPorCodigo(codigo);
+        boolean actualizado = false;
         try {
             String nombre = (String) JOptionPane.showInputDialog(this, "Nombre:", "Modificar",
                 JOptionPane.PLAIN_MESSAGE, null, null, p.getNombre());
@@ -168,13 +207,16 @@ public class InventarioGUI extends JFrame {
             int smin = Integer.parseInt(minimoTexto);
             inv.modificarProducto(codigo, java.util.Map.of("nombre", nombre, "categoria", categoria,
                 "precio", precio, "stock_minimo", smin));
+            actualizado = true;
         } catch (Exception e) { error(e); }
         refrescar();
+        if (actualizado) notificarStockBajoNuevo();
     }
 
     private void movimiento(String tipo) {
         String codigo = codigoSeleccionado();
         if (codigo == null) return;
+        boolean actualizado = false;
         try {
             String valor = pedir("Cantidad (entero positivo):");
             if (valor == null) return;
@@ -182,8 +224,10 @@ public class InventarioGUI extends JFrame {
             String fecha = LocalDate.now().toString();
             if (tipo.equals("entrada")) inv.registrarEntrada(codigo, cantidad, fecha);
             else inv.registrarSalida(codigo, cantidad, fecha);
+            actualizado = true;
         } catch (Exception e) { error(e); }  // p. ej. salida excesiva
         refrescar();
+        if (actualizado) notificarStockBajoNuevo();
     }
 
     private void historial() {
